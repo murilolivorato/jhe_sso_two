@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\SiteController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,12 +19,12 @@ use Illuminate\Support\Facades\Http;
 Route::get('/', function () {
     return view('welcome');
 });
-
+Route::get('/show-api', [SiteController::class, 'index']);
 Route::get('/login', function (Request $request) {
     $request->session()->put("state", $state = Str::random(40));
     $query = http_build_query([
         "client_id" => "96886ab2-045e-47ac-9004-dd28787dfd72",
-        "redirect_url" => "http://localhost:8080/callback",
+        "redirect_url" => "http://localhost:8081/callback",
         "response_type" => "code",
         "scope" => "",
         "state" => $state
@@ -36,13 +37,23 @@ Route::get('/callback', function (Request $request) {
 
     throw_unless(strlen($state) > 0 && $state == $request->state, InvalidArgumentException::class);
     $response = Http::asForm()->post(
-        "http://localhost:8080/oauth/token",
+        "http://jhe_sso_one/oauth/token",
         [
         "grand_type" => "authorization_code",
         "client_id" => "96886ab2-045e-47ac-9004-dd28787dfd72",
         "client_secret" => "ziEBXJR2OQvio2b6K8WWStw8bReZyfrrnOHMf1nk",
-        "redirect_url" => "http://localhost:8080/callback",
+        "redirect_url" => "http://localhost:8081/callback",
         "code" => $request->code
-
     ]);
+    return $response->json();
 });
+
+Route::get('/authuser', function (Request $request) {
+    $access_token = "";
+    $response = Http::withHeaders([
+        "Accept" => "application/json",
+        "Authorization" => "Bearer " . $access_token
+    ])->get("http://jhe_sso_one/api/user");
+    return $response->json();
+});
+
