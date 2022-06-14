@@ -1,8 +1,7 @@
 version: "3.9"
 networks:
   jhe_sso_one:
-    external:
-      name: jhe_sso_one
+    driver: bridge
   jhe_sso_two:
 services:
   server:
@@ -10,8 +9,9 @@ services:
     build:
       context: .
       dockerfile: dockerfiles/nginx.dockerfile
+    restart: unless-stopped
     ports:
-      - '8082:80'
+      - "8082:80"
     volumes:
       - ./src:/var/www/html
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
@@ -19,6 +19,8 @@ services:
       - php
       - redis
       - mysql
+      - jhe_sso_one
+      - jhe_sso_two
     container_name: jhe_sso_two_server
     networks:
       - jhe_sso_two
@@ -43,6 +45,8 @@ services:
     container_name: php_two_server
     volumes:
       - ./src:/var/www/html:delegated
+    ports:
+      - 8085:9000
     networks:
       - jhe_sso_two
       - jhe_sso_one
