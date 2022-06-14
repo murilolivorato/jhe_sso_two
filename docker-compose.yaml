@@ -76,3 +76,13 @@ services:
     entrypoint: ["php", "/var/www/html/artisan"]
     networks:
       - jhe_sso_two
+  npm:
+    build:
+      context: .
+      dockerfile: dockerfiles/node.dockerfile
+    working_dir: /var/www/html
+    entrypoint: [ "npm" ]
+    volumes:
+      - ./src:/var/www/html
+    networks:
+      - jhe_sso_two
