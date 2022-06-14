@@ -16,7 +16,6 @@ use App\Http\Controllers\SSOController;
 */
 
 Auth::routes(['register' => false, 'reset' => false]);
-Route::get('/show-api', [SiteController::class, 'index']);
 Route::get('/sso-login', [SSOController::class, 'getLogin'])->name("sso.login");
 Route::get('/callback', [SSOController::class, 'getCallBack'])->name("sso.callback");
 Route::get('/connect-user', [SSOController::class, 'connectUser'])->name("sso.connect");

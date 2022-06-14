@@ -5,12 +5,14 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Login') }}</div>
-
-                <div class="card-body">
+                <div class="card-header text-center"><h3>Acesso a Área Adminstrativa</h3></div>
+                <div class="card-body mb-3">
                     <form method="POST" action="{{ route('login') }}">
-
-                           <h3><a href="{{ route('sso.login')  }}" class="btn btn-block btn-info btn-sm" >Acessar Área de Login - SSO </a></h3>
+                        <div class="row mb-3">
+                            <div class="col text-center">
+                                   <h3><a href="{{ route('sso.login')  }}" class="btn btn-primary btn-lg btn-block" >ACESSAR ÁREA DE LOGIN - SSO</a></h3>
+                            </div>
+                        </div>
 
                     </form>
                 </div>

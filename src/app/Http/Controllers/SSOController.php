@@ -8,8 +8,19 @@ use Illuminate\Support\Facades\Http;
 use InvalidArgumentException;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * SSO CONTROLLER
+ */
 class SSOController extends Controller
 {
+    /**
+     * GET LOGIN
+     * CRIA UMA SESSÃO CHAMADA STATE, PARA INDENTIFICAR O USUÁRIO APÓS O LOGIN NO OUTRO SERVIDOR
+     * O USUÁRIO É REDIRECIONADO PARA A OUTRA PÁGINA COM AS CREDENCIAIS
+     * LÁ O USUÁRIO IRÁ FAZER O LOGIN NO SERVIDOR - SS0 1
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function getLogin(Request $request)
     {
         $request->session()->put("state", $state = Str::random(40));
@@ -22,6 +33,17 @@ class SSOController extends Controller
         ]);
         return redirect(config("auth.sso_http_host")."/oauth/authorize?" . $query);
     }
+
+    /**
+     * CALL BACK PAGE
+     * VERIFICA O USUÁRIO COM A SESSÃO STATE
+     * SE FOR UMA SESSÃO INVÁLIDA, PRINTA UM ERRO
+     * CRIA UMA SESSÃO COM OS DADOS DO CLIENTE
+     * REDIRECIONA PARA A CONECÇÃO DE USUÁRIO NO SERVIDOR -SSO 2
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @throws \Throwable
+     */
     public function getCallBack(Request $request)
     {
         $state = $request->session()->pull("state");
@@ -38,6 +60,15 @@ class SSOController extends Controller
         $request->session()->put($response->json());
         return redirect(route("sso.connect"));
     }
+
+    /** CONNECT USER
+     *  PEGA O ACCESS TOKEN ATRAVÉS DE UMA SESSÃO
+     *  FAZ UMA REQUISIÇÃO AO SERVIDOR SSO 1 PARA PEGAR OS DADOS DO USUÁRIO
+     * CASO O USUÁRIO NÃO EXISTE , ENTÃO ELE CRIA
+     * LIBERA A AUTENTICAÇÃO DO USUÁRIO
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function connectUser(Request $request)
     {
         $access_token = $request->session()->get("access_token");
